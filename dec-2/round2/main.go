@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"sync"
 )
 
 type Round struct {
@@ -18,6 +19,12 @@ type Round struct {
 type Game struct {
 	ID     string
 	Rounds []Round
+}
+
+type CubePower struct {
+	GameID       string
+	MinimumCubes Round
+	CubePower    int
 }
 
 func main() {
@@ -38,24 +45,41 @@ func main() {
 
 }
 
-func checkGamePower(input []Game) {
-
-	totalCubePower := 0
+func calculateGamePower(input []Game) (totalCubePower int, powers []CubePower) {
+	powerChan := make(chan CubePower, len(input))
+	var wg sync.WaitGroup
 
 	for _, game := range input {
-		fmt.Println("***********************")
-		fmt.Println(" ")
-		minimumCubes := getMinimumCubes(game)
-		fmt.Println("Minimum Cubes for Game", game.ID, ":", minimumCubes)
-
-		// Cube power is the product of the minimum cubes for each color
-		cubePower := minimumCubes.red * minimumCubes.green * minimumCubes.blue
-		totalCubePower += cubePower
-		fmt.Println("Cube Power for Game", game.ID, ":", cubePower)
-
-		fmt.Println(" ")
+		wg.Add(1)
+		go func(game Game) {
+			defer wg.Done()
+			minimumCubes := getMinimumCubes(game)
+			cubePower := minimumCubes.red * minimumCubes.green * minimumCubes.blue
+			powerChan <- CubePower{game.ID, minimumCubes, cubePower}
+		}(game)
 	}
 
+	go func() {
+		wg.Wait()
+		close(powerChan)
+	}()
+
+	for power := range powerChan {
+		totalCubePower += power.CubePower
+		powers = append(powers, power)
+	}
+
+	return totalCubePower, powers
+}
+
+func printGamePower(totalCubePower int, powers []CubePower) {
+	for _, power := range powers {
+		fmt.Println("***********************")
+		fmt.Println(" ")
+		fmt.Println("Minimum Cubes for Game", power.GameID, ":", power.MinimumCubes)
+		fmt.Println("Cube Power for Game", power.GameID, ":", power.CubePower)
+		fmt.Println(" ")
+	}
 	fmt.Printf(`
 	***********************
 
@@ -63,7 +87,11 @@ func checkGamePower(input []Game) {
 	
 	***********************`,
 		totalCubePower)
+}
 
+func checkGamePower(input []Game) {
+	totalCubePower, powers := calculateGamePower(input)
+	printGamePower(totalCubePower, powers)
 }
 
 func getMinimumCubes(game Game) Round {
@@ -137,6 +165,10 @@ func checkGame(game Game, cubeQty map[string]int) bool {
 	return true
 }
 
+func checkRound(round Round, cubeQty map[string]int) bool {
+	return round.red <= cubeQty["red"] && round.green <= cubeQty["green"] && round.blue <= cubeQty["blue"]
+}
+
 func ReadInput() []string {
 	// read input from ./input.txt - can be any length
 	input := []string{}
@@ -166,100 +198,77 @@ func readGames(input []string) []Game {
 	return games
 }
 
-func readGame(input string) Game {
-
-	// 1. Read game ID - will follow the pattern "Game {ID}:" using regex
-	// This will take the number from {ID} between "Game " and ":"
+func parseGameID(input string) string {
 	gameCheck := regexp.MustCompile(`Game (\d+):`)
-	gameID := gameCheck.FindStringSubmatch(input)[1]
-	// fmt.Println("Game ID", gameID)
+	return gameCheck.FindStringSubmatch(input)[1]
+}
 
-	// Remove game ID from input
-	input = gameCheck.ReplaceAllString(input, "")
+func removeGameID(input string) string {
+	gameCheck := regexp.MustCompile(`Game (\d+):`)
+	return gameCheck.ReplaceAllString(input, "")
+}
 
-	// 2. Each round will be separated by a ";"
-	// 3. The number of cubes will be in the pattern {qty} {colour}, {qty} {colour},
-	// eg. "12 red, 13 green, 14 blue"
+func splitIntoRounds(input string) []string {
+	return regexp.MustCompile(`;`).Split(input, -1)
+}
 
-	// Split input into rounds by ;
-	rounds := regexp.MustCompile(`;`).Split(input, -1)
-
-	parsedRounds := []Round{}
-
-	for _, round := range rounds {
-		parsedRound := Round{
-			red:   0,
-			green: 0,
-			blue:  0,
-		}
-
-		// Find the qty of each color in the round
-		parsedRound.red = parseColor("red", round)
-		parsedRound.green = parseColor("green", round)
-		parsedRound.blue = parseColor("blue", round)
-
-		parsedRounds = append(parsedRounds, parsedRound)
+func parseRound(round string) Round {
+	return Round{
+		red:   parseColor("red", round),
+		green: parseColor("green", round),
+		blue:  parseColor("blue", round),
 	}
+}
 
-	// Add round and game ID to game struct
-	game := Game{
+func parseRounds(rounds []string) []Round {
+	parsedRounds := make([]Round, len(rounds))
+	for i, round := range rounds {
+		parsedRounds[i] = parseRound(round)
+	}
+	return parsedRounds
+}
+
+func readGame(input string) Game {
+	gameID := parseGameID(input)
+	input = removeGameID(input)
+	rounds := splitIntoRounds(input)
+	parsedRounds := parseRounds(rounds)
+
+	return Game{
 		ID:     gameID,
 		Rounds: parsedRounds,
 	}
-
-	return game
-
 }
 
 //  parse color and qty from string
 //  string will be in the pattern {qty} {colour},
 //  takes the color to look for and the string to look in
 //  returns the qty of that color
-func parseColor(color string, input string) int {
-	// Find the color in the string using regex {qty} {colour}
-	colorCheck := regexp.MustCompile(`(\d+) ` + color)
+func parseColor(color, input string) int {
+	// Use a regular expression to find the quantity of the color in the string.
+	colorCheck := regexp.MustCompile(`(\d+)\s+` + regexp.QuoteMeta(color))
 
-	// Find the qty of the color in the string
-	colorQty := colorCheck.FindStringSubmatch(input)
-
-	// If the color is not found, return 0
-	if len(colorQty) == 0 {
+	matches := colorCheck.FindStringSubmatch(input)
+	if matches == nil {
+		// The color was not found in the string.
 		return 0
 	}
 
-	// Convert qty string to int using strconv.Atoi
-	colorQtyInt, err := strconv.Atoi(colorQty[1])
+	// Convert the quantity string to an integer.
+	qty, err := strconv.Atoi(matches[1])
 	if err != nil {
-		log.Fatal(err)
+		return 0
 	}
 
-	return colorQtyInt
+	return qty
 }
 
-// Pretty print game
-
+// PrettyPrint displays game details in a formatted manner.
 func prettyPrint(game Game) {
-	fmt.Println("***********************")
-	fmt.Println("Game ID:", game.ID)
+	fmt.Printf("***********************\nGame ID: %s\n", game.ID)
 	for index, round := range game.Rounds {
-		fmt.Println("=====================")
-		fmt.Println("ROUND:", index+1)
-		fmt.Println("Red: ", round.red)
-		fmt.Println("Green: ", round.green)
-		fmt.Println("Blue: ", round.blue)
-		fmt.Println("=====================")
+		fmt.Printf("=====================\nROUND: %d\nRed: %d\nGreen: %d\nBlue: %d\n=====================\n",
+			index+1, round.red, round.green, round.blue)
 	}
 	fmt.Println("***********************")
-}
-
-// Checks if the values in the round are valid based on current cubeQty
-// Takes a round and a map of cubeQty
-// Returns true if the round is valid, false if not
-func checkRound(round Round, cubeQty map[string]int) bool {
-	if round.red > cubeQty["red"] ||
-		round.green > cubeQty["green"] ||
-		round.blue > cubeQty["blue"] {
-		return false
-	}
-	return true
 }
