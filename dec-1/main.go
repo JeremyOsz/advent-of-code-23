@@ -7,6 +7,8 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
+	"sync"
 )
 
 // ReadInput reads calibrationValues from ./input.txt
@@ -31,21 +33,58 @@ func main() {
 		log.Fatal(err)
 	}
 
-	firstAndLastNumbers := []int{}
-	for _, line := range input {
-		number, err := getFirstAndLastNumber(line)
-		if err != nil {
-			log.Fatal(err)
-		}
-		firstAndLastNumbers = append(firstAndLastNumbers, number)
-	}
+	firstAndLastNumbers, errors := processLines(input)
 
-	sum := 0
-	for _, number := range firstAndLastNumbers {
-		sum += number
-	}
+	// Start a goroutine to receive from the errors channel
+	go func() {
+		for err := range errors {
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}()
+
+	sum := collectResults(firstAndLastNumbers)
 
 	fmt.Println(sum)
+}
+
+func processLines(input []string) (chan int, chan error) {
+	firstAndLastNumbers := make(chan int)
+	errors := make(chan error)
+
+	var wg sync.WaitGroup
+
+	// Start a goroutine for each line in the input
+	for _, line := range input {
+		wg.Add(1)
+		go func(line string) {
+			defer wg.Done()
+			number, err := getFirstAndLastNumber(line)
+			if err != nil {
+				errors <- err
+				return
+			}
+			firstAndLastNumbers <- number
+		}(line)
+	}
+
+	// Start a goroutine to close the channels after all the other goroutines have finished
+	go func() {
+		wg.Wait()
+		close(firstAndLastNumbers)
+		close(errors)
+	}()
+
+	return firstAndLastNumbers, errors
+}
+
+func collectResults(firstAndLastNumbers chan int) int {
+	sum := 0
+	for number := range firstAndLastNumbers {
+		sum += number
+	}
+	return sum
 }
 
 // parseNumber maps number words to numbers
@@ -71,11 +110,11 @@ func parseNumber(number string) string {
 
 // reverse reverses a string
 func reverse(s string) string {
-	rns := []rune(s)
-	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
-		rns[i], rns[j] = rns[j], rns[i]
-	}
-	return string(rns)
+	n := len(s)
+	return strings.Map(func(r rune) rune {
+		n--
+		return rune(s[n])
+	}, s)
 }
 
 // getFirstAndLastNumber searches a string for a number character from the start and end of the string
