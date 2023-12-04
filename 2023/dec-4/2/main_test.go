@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -27,49 +26,67 @@ func TestCalibrate(t *testing.T) {
 	input := readInput("./calibrate.txt")
 	scratchcards := getScratchcards(input)
 
-	// Card 1 has three winning numbers (48, 83, 17, and 86), so it is worth 8 points.
-	// Card 2 has two winning numbers (32 and 61), so it is worth 2 points.
-	// Card 3 has two winning numbers (1 and 21), so it is worth 2 points.
-	// Card 4 has one winning number (84), so it is worth 1 point.
-	// Card 5 has no winning numbers, so it is worth no points.
-	// Card 6 has no winning numbers, so it is worth no points.
-	if scratchcards[0].points != 8 {
-		t.Errorf("Expected scratchcards[0].points to be 8, got %d", scratchcards[0].points)
+	// Card 1 has 4 wins
+	if scratchcards[0].wins != 4 {
+		t.Errorf("Expected scratchcards[0].wins to be 4, got %d", scratchcards[0].wins)
 	}
-	if scratchcards[1].points != 2 {
-		t.Errorf("Expected scratchcards[1].points to be 2, got %d", scratchcards[1].points)
+	// Card 2 has 2 wins
+	if scratchcards[1].wins != 2 {
+		t.Errorf("Expected scratchcards[1].wins to be 2, got %d", scratchcards[1].wins)
 	}
-	if scratchcards[2].points != 2 {
-		t.Errorf("Expected scratchcards[2].points to be 2, got %d", scratchcards[2].points)
+	// Card 3 has 2 wins
+	if scratchcards[2].wins != 2 {
+		t.Errorf("Expected scratchcards[2].wins to be 2, got %d", scratchcards[2].wins)
 	}
-	if scratchcards[3].points != 1 {
-		t.Errorf("Expected scratchcards[3].points to be 1, got %d", scratchcards[3].points)
+	// Card 4 has 1 win
+	if scratchcards[3].wins != 1 {
+		t.Errorf("Expected scratchcards[3].wins to be 1, got %d", scratchcards[3].wins)
 	}
-	if scratchcards[4].points != 0 {
-		t.Errorf("Expected scratchcards[4].points to be 0, got %d", scratchcards[4].points)
+	// Card 5 has 0 wins
+	if scratchcards[4].wins != 0 {
+		t.Errorf("Expected scratchcards[4].wins to be 0, got %d", scratchcards[4].wins)
 	}
-	if scratchcards[5].points != 0 {
-		t.Errorf("Expected scratchcards[5].points to be 0, got %d", scratchcards[5].points)
-	}
-
-	sum := sumPoints(scratchcards)
-	if sum != 13 {
-		t.Errorf("Expected scratchcards to be 13, got %d", sum)
+	// Card 6 has 0 wins
+	if scratchcards[5].wins != 0 {
+		t.Errorf("Expected scratchcards[5].wins to be 0, got %d", scratchcards[5].wins)
 	}
 
-	// Return the sum of all points
-	fmt.Printf(`
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	processedCards := returnResults(scratchcards)
 
+	// Card 1 has 1 copy
+	if processedCards[0].copies != 1 {
+		t.Errorf("Expected processedCards[0].copies to be 1, got %d", processedCards[0].copies)
+	}
 
-		SCRATCH CARD RESULTS
-		++++++++++++
+	// Card 2 has 2 copies
+	if processedCards[1].copies != 2 {
+		t.Errorf("Expected processedCards[1].copies to be 2, got %d", processedCards[1].copies)
+	}
 
-		Total points: %d
+	// Card 3 has 4 copies
+	if processedCards[2].copies != 4 {
+		t.Errorf("Expected processedCards[2].copies to be 4, got %d", processedCards[2].copies)
+	}
 
-		++++++++++++
+	// Card 4 has 8 copies
+	if processedCards[3].copies != 8 {
+		t.Errorf("Expected processedCards[3].copies to be 8, got %d", processedCards[3].copies)
+	}
 
-		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	`,
-		sum)
+	// Card 5 has 14 copies
+	if processedCards[4].copies != 14 {
+		t.Errorf("Expected processedCards[4].copies to be 14, got %d", processedCards[4].copies)
+	}
+
+	// Card 6 has 1 copy
+	if processedCards[5].copies != 1 {
+		t.Errorf("Expected processedCards[5].copies to be 1, got %d", processedCards[5].copies)
+	}
+
+	sumCards := sumCards(processedCards)
+
+	// Sum of cards is 30
+	if sumCards != 30 {
+		t.Errorf("Expected sumCards to be 30, got %d", sumCards)
+	}
 }
