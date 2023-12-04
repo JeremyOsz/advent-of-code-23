@@ -13,17 +13,17 @@ import (
 const symbol = "*"
 
 func main() {
-	// read input from ./input.txt - can be any length
-	input := readInput("calibrate.txt")
+	input := readInput("./input.txt")
+	result := readSchematic(input)
+	sum := schematicSum(result)
 
-	// read schematic from input
-	readSchematic(input)
-
-	// // calculate power of schematic
-	// power := calculatePower(schematic)
-
-	// // print power
-	// log.Println(power)
+	// expect sum to be 4361
+	fmt.Print(
+		"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n",
+		"We have a result.... ", sum,
+		"\n\nCheck if it works!",
+		"\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n",
+	)
 }
 
 func readInput(filename string) []string {
@@ -50,17 +50,7 @@ func readSchematic(lines []string) []int {
 	parts := []int{}
 
 	// loop through lines
-	for lineIndex, line := range lines {
-
-		// Get numbers from each line
-		numbers := getNumbersFromLine(line)
-
-		// Print line and numbers
-		fmt.Print(
-			"\n\n*******************************************\n\n",
-			"Processing line: \n ", line, "\n",
-			"Numbers in line: ", strings.Join(numbers, ", "),
-		)
+	for lineIndex := range lines {
 
 		// Add parts in line to parts
 		parts = append(parts, processLine(lineIndex, lines)...)
@@ -92,15 +82,17 @@ func processLine(index int, lines []string) []int {
 		fmt.Print("\n\n====================\n\n")
 		fmt.Println("Checking number: ", number)
 
-		start, end := getScanRange(currentLine, number)
-
+		num := number[0]
+		// numIndex should be Int
+		numIndex, _ := strconv.Atoi(number[1])
+		start, end := getScanRangeFromIndex(currentLine, num, numIndex)
 		// check if there is a symbol on same line adjacent to number
 		if checkLine(currentLine, start, end) {
 			fmt.Print(
 				"\n===== \n\n",
-				"Found a symbol on same line adjacent to number: "+number+" in line: "+currentLine+"\n\n",
+				"Found a symbol on same line adjacent to number: "+num+" in line: "+currentLine+"\n\n",
 			)
-			parts = append(parts, processNumber(number))
+			parts = append(parts, processNumber(num))
 			continue
 		}
 
@@ -116,7 +108,7 @@ func processLine(index int, lines []string) []int {
 					previousLine,
 					currentLine,
 				)
-				parts = append(parts, processNumber(number))
+				parts = append(parts, processNumber(num))
 				continue
 			}
 		}
@@ -133,7 +125,7 @@ func processLine(index int, lines []string) []int {
 					currentLine,
 					nextLine,
 				)
-				parts = append(parts, processNumber(number))
+				parts = append(parts, processNumber(num))
 				continue
 			}
 		}
@@ -148,6 +140,27 @@ func processLine(index int, lines []string) []int {
 	return parts
 }
 
+func findAllIndices(s, sub string) []int {
+	var indices []int
+	for i := 0; i < len(s); i++ {
+		if strings.HasPrefix(s[i:], sub) {
+			indices = append(indices, i)
+		}
+	}
+	return indices
+}
+
+func getScanRangeFromIndex(line string, number string, index int) (int, int) {
+	if index == 0 {
+		return 0, len(number) + 1
+	}
+	// If number is at the end of the line range is index - 1 to EOL
+	if index+len(number) == len(line) {
+		return index - 1, len(line)
+	}
+	return index - 1, index + len(number) + 1
+}
+
 func processNumber(number string) int {
 	numberInt, err := strconv.Atoi(number)
 	if err != nil {
@@ -156,16 +169,29 @@ func processNumber(number string) int {
 	return numberInt
 }
 
-func getNumbersFromLine(line string) []string {
+// get each number and their indices in line
+func getNumbersFromLine(line string) [][]string {
 	// regex to check for numbers
 	numberCheck := regexp.MustCompile(`\d+`)
-	// find all numbers in line
+
+	// Create a slice of all matching numbers and their indices
+	// with the structure [[number, index], [number, index]]
+
+	// Find all the numbers in the line
 	numbers := numberCheck.FindAllString(line, -1)
+	indices := numberCheck.FindAllStringIndex(line, -1)
 
 	fmt.Println("Numbers in line: ", numbers)
 
-	return numbers
+	// Create a slice of slices to hold numbers and their indices
+	numbersAndIndices := [][]string{}
+	for i, number := range numbers {
+		numbersAndIndices = append(numbersAndIndices, []string{number, strconv.Itoa(indices[i][0])})
+	}
 
+	fmt.Println("Numbers and indices: ", numbersAndIndices)
+
+	return numbersAndIndices
 }
 
 func getScanRange(line string, number string) (int, int) {
@@ -176,6 +202,15 @@ func getScanRange(line string, number string) (int, int) {
 	// find start index of number in line
 	startIndex := strings.Index(line, number)
 	endIndex := startIndex + len(number)
+
+	// match all indices of number in line
+	indices := findAllIndices(line, number)
+
+	// if there is more than one index, find the index that matches the number
+	if len(indices) > 1 {
+		// Print fatal error if there is more than one index
+		log.Fatal("More than one index found for number: ", number, " in line: ", line)
+	}
 
 	if startIndex > 0 {
 		start = startIndex - 1
