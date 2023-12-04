@@ -8,19 +8,34 @@ import (
 	"strconv"
 )
 
-func main() {
-	fmt.Println("Hello, World!")
-}
-
+// calorieCount calculates the sum of the top 3 calories for each elf
 func calorieCount(input []string) int {
 	// Break input into chunks - using whitespace as delimiter
+	elves := chunkInput(input)
 
+	// Sum the calories for each elf
+	maxCalories := sumCalories(elves)
+
+	// Sort the calories in descending order
+	sort.Slice(maxCalories, func(i, j int) bool {
+		return maxCalories[i] > maxCalories[j]
+	})
+
+	// Sum the top 3 calories
+	sum := 0
+	for i := 0; i < 3 && i < len(maxCalories); i++ {
+		sum += maxCalories[i]
+	}
+
+	return sum
+}
+
+// chunkInput breaks input into chunks using whitespace as delimiter
+func chunkInput(input []string) [][]int {
 	elf := []int{}
 	elves := [][]int{}
 
 	for i, line := range input {
-		fmt.Println(line)
-		// If line is empty, add elf to elves and reset elf
 
 		// If line is not empty, add calorie to elf
 		if line != "" {
@@ -46,8 +61,11 @@ func calorieCount(input []string) int {
 		}
 
 	}
+	return elves
+}
 
-	// Sum the calories for each elf
+// sumCalories sums the calories for each elf
+func sumCalories(elves [][]int) []int {
 	maxCalories := []int{}
 	for _, elf := range elves {
 		sum := 0
@@ -56,23 +74,10 @@ func calorieCount(input []string) int {
 		}
 		maxCalories = append(maxCalories, sum)
 	}
-
-	fmt.Println(maxCalories)
-
-	// Sort the calories in descending order
-	sort.Slice(maxCalories, func(i, j int) bool {
-		return maxCalories[i] > maxCalories[j]
-	})
-
-	// Sum the top 3 calories
-	sum := 0
-	for i := 0; i < 3 && i < len(maxCalories); i++ {
-		sum += maxCalories[i]
-	}
-
-	return sum
+	return maxCalories
 }
 
+// readLines reads a file into an array of strings
 func readLines(filename string) ([]string, error) {
 	file, err := os.Open(filename)
 	if err != nil {
