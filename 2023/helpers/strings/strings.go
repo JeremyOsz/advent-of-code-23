@@ -7,7 +7,6 @@ import (
 )
 
 func ConvertToInt(number string) int {
-	fmt.Println(number)
 	numberInt, err := strconv.Atoi(number)
 	if err != nil {
 		fmt.Println("Error converting string to int")
