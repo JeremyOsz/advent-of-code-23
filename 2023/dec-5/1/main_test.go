@@ -66,4 +66,11 @@ func TestCalibrate(t *testing.T) {
 			t.Errorf("Expected seeds[%d].humidity to be %d, got %d", test.id, test.humidity, seeds[test.id].humidity)
 		}
 	}
+
+	lowest := findLowestLocation(seeds)
+
+	// Expect lowest to be 35
+	if lowest != 35 {
+		t.Errorf("Expected lowest to be 35, got %d", lowest)
+	}
 }

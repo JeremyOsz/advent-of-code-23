@@ -31,21 +31,62 @@ type Map []MapRow
 type Seeds map[int]Seed
 
 func main() {
-	fmt.Println("Hello, World!")
-	chunks := readFileChunks("./calibrate.txt")
+	chunks := readFileChunks("./input.txt")
 	seeds := createSeeds(chunks[0])
 	maps := readMaps(chunks, seeds)
-	analyseSeedMap(seeds, maps)
+	seeds = analyseSeedMap(seeds, maps)
+	lowest := findLowestLocation(seeds)
+
+	fmt.Printf(`
+	
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+	SEED ANALYSIS RESULTS
+	++++++++++++++++++++
+
+	lowest location: %d
+
+	++++++++++++++++++++
+
+	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+	`, lowest)
+}
+
+func findLowestLocation(seeds Seeds) int {
+	// Arbitrary high number lowest will be compared to
+	lowestLocation := 999999999999999999
+	for _, seed := range seeds {
+		if seed.location < lowestLocation {
+			lowestLocation = seed.location
+		}
+	}
+
+	return lowestLocation
 }
 
 func analyseSeedMap(seeds Seeds, maps Maps) Seeds {
-	soilMap := maps["soil"]
-	fertilizerMap := maps["fertilizer"]
-	waterMap := maps["water"]
-	lightMap := maps["light"]
-	temperatureMap := maps["temperature"]
-	humidityMap := maps["humidity"]
-	locationMap := maps["location"]
+	fmt.Printf(`
+		!!!!!!!!!!!!!
+		
+		analyseSeedMap: 
+		
+		seeds
+		%v
+
+		maps
+		%v
+
+	`,
+		seeds, maps)
+	soilMap := maps["seed-to-soil"]
+	fertilizerMap := maps["soil-to-fertilizer"]
+	waterMap := maps["fertilizer-to-water"]
+	lightMap := maps["water-to-light"]
+	temperatureMap := maps["light-to-temperature"]
+	humidityMap := maps["temperature-to-humidity"]
+	locationMap := maps["humidity-to-location"]
 
 	var processedSeeds = Seeds{}
 
@@ -73,21 +114,38 @@ func analyseSeedMap(seeds Seeds, maps Maps) Seeds {
 }
 
 func readMap(source int, destinationMap *Map) int {
+	fmt.Printf(`
+	
+		============
+
+		Mapping source %d
+
+		Based on map:
+		%v
+
+	`,
+		source,
+		*(destinationMap))
 	for _, row := range *(destinationMap) {
 		// If within range
 		if source >= row.source_range_index && source <= row.source_range_index+row.range_length {
-			// save plant position
-			plantPosition := row.destination_range_index
-			// add 1 to the destination to mark it as planted
-			row.destination_range_index++
-			// remove 1 from the range to mark one less planter available
-			row.range_length--
+			fmt.Println("Source is within range")
 
-			return plantPosition
+			// Calculate position
+			// Range is destination_range_index to destination_range_index + range_length
+			// SO
+			// position = destination_range_index + (source - source_range_index)
+			// Eg Source 79, range_length 48, source_range_index 50, destination_range_index 52
+			// Because 79 is within range 52-100, the position is 52 + (79-50) = 81
+
+			position := row.destination_range_index + (source - row.source_range_index) // Calculate position
+
+			return position
 		}
 	}
 
 	// Should only get here if there are no planters available or if the source is not within range
+	fmt.Println("No planters available - returning source")
 	return source
 }
 
