@@ -16,7 +16,7 @@ func ConvertToInt(number string) int {
 	return numberInt
 }
 
-func ConvertSliceToInt(slice []string) []int {
+func ConvertSliceToInts(slice []string) []int {
 	var intSlice []int
 	// Convert slice of strings to slice of ints
 	for _, number := range slice {

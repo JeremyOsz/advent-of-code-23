@@ -73,10 +73,10 @@ func getCard(line string) Card {
 	// Split line into two numbers based on |
 	numberSets := strings.Split(line, "|")
 
-	card.winning = string_helpers.ConvertSliceToInt(
+	card.winning = string_helpers.ConvertSliceToInts(
 		strings.Split(numberSets[0], " "),
 	)
-	card.numbers = string_helpers.ConvertSliceToInt(
+	card.numbers = string_helpers.ConvertSliceToInts(
 		strings.Split(numberSets[1], " "),
 	)
 
