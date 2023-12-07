@@ -76,53 +76,31 @@ func getRecordRange(race Race) [2]int {
 	raceTime := race[0]
 	record := race[1]
 
-	// Idea 1 - find distances from a time of 1ms+
-	// at point distances are diminishing returns continue until below record distance
-
-	distances := [][2]int{}
-	passedRecord := false
-	for buttonTime := 1; buttonTime <= raceTime; buttonTime++ {
-		if passedRecord && buttonTime > record {
-			break
-		}
-
+	right := [][2]int{}
+	for buttonTime := raceTime / 2; buttonTime < raceTime; buttonTime++ {
 		timeLeft := raceTime - buttonTime
 		distance := timeLeft * buttonTime
-		distances = append(distances, [2]int{buttonTime, distance})
-
 		if distance > record {
-			passedRecord = true
+			right = append(right, [2]int{buttonTime, distance})
 		}
 	}
 
-	// Get number of distances higher than record
-	fmt.Println("distances", distances)
-	updatedDistances := [][2]int{}
-	for _, distance := range distances {
-		if distance[1] > record {
-			updatedDistances = append(updatedDistances, distance)
+	left := [][2]int{}
+	for buttonTime := (raceTime / 2) - 1; buttonTime >= 0; buttonTime-- {
+		timeLeft := raceTime - buttonTime
+		distance := timeLeft * buttonTime
+		if distance > record {
+			left = append(left, [2]int{buttonTime, distance})
 		}
 	}
+
+	fmt.Println("left", left)
+	fmt.Println("right", right)
+
+	// combine left and right
 
 	// Get the min and max times
-	min := updatedDistances[0][0]
-	max := updatedDistances[0][0]
-	for _, distance := range updatedDistances {
-		if distance[0] < min {
-			min = distance[0]
-		}
-		if distance[0] > max {
-			max = distance[0]
-		}
-	}
-
-	fmt.Println("min", min)
-	fmt.Println("max", max)
-
-	return [2]int{min, max}
-
-	// Idea 2 - Start at middle time and work outwards
-	// stopping when the distance is below record distance
+	return [2]int{left[len(left)-1][0], right[len(right)-1][0]}
 }
 
 // Get ranges for all races
