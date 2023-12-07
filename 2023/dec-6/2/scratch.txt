@@ -1,0 +1,50 @@
+Time = Time allowed for a race
+
+How to play: 
+- Hold a button to charge the boat
+- Release to set boat off
+- WIN by getting the furthest distance
+- BUT time starts when you first press the button
+
+Time:      7  15   30
+Distance:  9  40  200
+
+The first race lasts 7 milliseconds. The record distance in this race is 9 millimeters.
+The second race lasts 15 milliseconds. The record distance in this race is 40 millimeters.
+The third race lasts 30 milliseconds. The record distance in this race is 200 millimeters.
+
+Start speed: 0 mm/ms
+Acceleration: 1 mm/ms
+
+GIVEN Race Time = 7ms
+
+Hold 0ms, will travel 0mm
+Hold 1ms, will travel 6mm
+Hold 2ms, will travel 10mm
+Hold 3ms, will travel 12mm
+Hold 4ms, will travel 12mm
+Hold 5ms, will travel 10mm
+Hold 6ms, will travel 6mm
+Hold 7ms, will travel 0mm
+
+
+AGAIN
+
+Time:      7  15   30
+Distance:  9  40  200
+
+Current record is 9mm
+2, 3, 4, 5, will all beat 9mm
+
+RANGE to win 2-5
+Ways to win 4
+
+Second race winning range is 4-11
+Ways to win is 8
+
+Third race winning range is 11-19
+Ways to win is 9
+
+Total margin of error is 4*8*9 = 288
+
+
