@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"sync"
 )
 
 func main() {
@@ -57,18 +58,33 @@ func getSteps(filename string) int {
 		}
 	}
 
-	pathSteps := []int{}
+	//  handle starting nodes concurrently
+	pathSteps := make(chan int, len(startingNodes))
+	var wg sync.WaitGroup
 	for _, node := range startingNodes {
-		steps := 1
-		minSteps := stepThroughNodes(nodes[node], instructions, nodes, steps)
+		wg.Add(1)
+		go func(node string) {
+			defer wg.Done()
+			steps := 1
+			minSteps := stepThroughNodes(nodes[node], instructions, nodes, steps)
+			fmt.Println("Min steps for ", node, " is ", minSteps)
+			pathSteps <- minSteps
+		}(node)
+	}
+	wg.Wait()
+	close(pathSteps)
 
-		fmt.Println("Min steps for ", node, " is ", minSteps)
-		pathSteps = append(pathSteps, minSteps)
+	// Convert pathSteps to []int
+	pathStepsArr := make([]int, len(startingNodes))
+	i := 0
+	for step := range pathSteps {
+		pathStepsArr[i] = step
+		i++
 	}
 
 	fmt.Println("Path steps: ", pathSteps)
 
-	return LCM(pathSteps[0], pathSteps[1], pathSteps...)
+	return LCM(pathStepsArr[0], pathStepsArr[1], pathStepsArr...)
 }
 
 func stepThroughNodes(
@@ -83,10 +99,6 @@ func stepThroughNodes(
 		} else {
 			nextNode = currentNode[1]
 		}
-
-		// If key of currentNode is ZZZ, we're done
-		fmt.Println("Current Node: ", currentNode)
-		fmt.Println("Next Node: ", nextNode)
 
 		if nextNode[2] == 'Z' {
 			fmt.Println("Reached Z in ", steps, " steps")
