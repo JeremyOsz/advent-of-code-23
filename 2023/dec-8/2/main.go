@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	getSteps("./input.txt")
+	minSteps := getSteps("./input.txt")
+	fmt.Println("Min steps: ", minSteps)
 }
 
 func readInput(filename string) []string {
@@ -56,50 +57,46 @@ func getSteps(filename string) int {
 		}
 	}
 
-	// fmt.Println("nodes", nodes)
-	// fmt.Println("startingNodes: ", startingNodes)
+	pathSteps := []int{}
+	for _, node := range startingNodes {
+		steps := 1
+		minSteps := stepThroughNodes(nodes[node], instructions, nodes, steps)
 
-	steps := 1
+		fmt.Println("Min steps for ", node, " is ", minSteps)
+		pathSteps = append(pathSteps, minSteps)
+	}
 
-	return stepThroughNodes(startingNodes, instructions, nodes, steps)
+	fmt.Println("Path steps: ", pathSteps)
 
+	return LCM(pathSteps[0], pathSteps[1], pathSteps...)
 }
 
 func stepThroughNodes(
-	currentNodes []string,
+	currentNode []string,
 	instructions string,
 	nodes map[string][]string,
 	steps int) int {
-	fmt.Println("currentNodes: ", currentNodes)
 	for _, instruction := range instructions {
-
-		nextNodes := currentNodes
-		atZ := []bool{}
-		for i := range currentNodes {
-			if instruction == 'L' {
-				nextNodes[i] = nodes[currentNodes[i]][0]
-			} else {
-				nextNodes[i] = nodes[currentNodes[i]][1]
-			}
-
-			if nextNodes[i][2] == 'Z' {
-				atZ = append(atZ, true)
-			} else {
-				atZ = append(atZ, false)
-			}
+		nextNode := ""
+		if instruction == 'L' {
+			nextNode = currentNode[0]
+		} else {
+			nextNode = currentNode[1]
 		}
 
-		// if all in atZ are true, return steps
-		if allTrue(atZ) {
+		// If key of currentNode is ZZZ, we're done
+		fmt.Println("Current Node: ", currentNode)
+		fmt.Println("Next Node: ", nextNode)
+
+		if nextNode[2] == 'Z' {
 			fmt.Println("Reached Z in ", steps, " steps")
 			return steps
 		} else {
-			currentNodes = nextNodes
+			currentNode = nodes[nextNode]
 			steps++
 		}
 	}
-	return stepThroughNodes(currentNodes, instructions, nodes, steps)
-	// return steps
+	return stepThroughNodes(currentNode, instructions, nodes, steps)
 }
 
 func allTrue(arr []bool) bool {
@@ -109,4 +106,25 @@ func allTrue(arr []bool) bool {
 		}
 	}
 	return true
+}
+
+// Function to calculate GCD (Greatest Common Divisor)
+func GCD(a, b int) int {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
+}
+
+// Function to calculate LCM (Least Common Multiple)
+func LCM(a, b int, integers ...int) int {
+	result := a * b / GCD(a, b)
+
+	for i := 0; i < len(integers); i++ {
+		result = LCM(result, integers[i])
+	}
+
+	return result
 }
