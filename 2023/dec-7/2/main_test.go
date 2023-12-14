@@ -23,8 +23,14 @@ func TestReadInput(t *testing.T) {
 
 func TestCalibrate(t *testing.T) {
 	file := readInput("calibrate.txt")
-	expectedWinnings := []int{765, 440, 84, 2736, 2415}
-	expectedTotalWinnings := 765 + 440 + 84 + 2736 + 2415
+	// 	Output
+	// 220 * 5
+	// 483 * 4
+	// 684 * 3
+	// 28 * 2
+	// 765 * 1
+	expectedWinnings := []int{765, 28 * 2, 684 * 3, 483 * 4, 220 * 5}
+	expectedTotalWinnings := 765 + 28*2 + 684*3 + 483*4 + 220*5
 
 	totalWinnings, hands := getWinnings(file)
 

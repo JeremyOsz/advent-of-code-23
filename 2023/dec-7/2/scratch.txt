@@ -12,7 +12,7 @@ QQQJA 483
   - weakest hand will have rank 1 
 
 Cards are ranked from strongest to weakest as follows:
-- A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2
+- A, K, Q, J, T, 9, 8, 7, 6, 5, 4, 3, 2, J
 
 Hands are ranked from strongest to weakest as follows:
 - Five of a kind, where all five cards have the same label: AAAAA
@@ -26,24 +26,31 @@ Hands are ranked from strongest to weakest as follows:
 IF two hands have the same rank, 
 If two hands have the same type, a second ordering rule takes effect. Start by comparing the first card in each hand. If these cards are different, the hand with the stronger first card is considered stronger. If the first card in each hand have the same label, however, then move on to considering the second card in each hand. If they differ, the hand with the higher second card wins; otherwise, continue with the third card in each hand, then the fourth, then the fifth.
 
-
 TASK - Find the total winnings from the input file
+
+JOKERS
+J is a joker and can be used as any card
+Joker can be used to make a 5 of a kind
+BUT J is always the lowest card in the hand
+SO QQQQA is better than QQQJA 
 
 Given
 
 HAND  BID
-QQQJA 483 = 3 of a kind - Q high
-T55J5 684 = 3 of a kind - 5 high
+KTJJT 220 = 4 of a kind - J high
+QQQJA 483 = 4 of a kind - Q high
+T55J5 684 = 4 of a kind - T high
 KK677 28 = 2 pair - K high
-KTJJT 220 = 2 pair - J high
 32T3K 765 = 1 pair - T high
 
 Output
-483 * 5
-684 * 4
-28  * 3
-220 * 2
+220 * 5
+483 * 4
+684 * 3
+28 * 2
 765 * 1
+
+
 
 
 

@@ -25,10 +25,9 @@ const (
 type Card rune
 
 var cardRanks = map[rune]int{
-	'A': 14,
-	'K': 13,
-	'Q': 12,
-	'J': 11,
+	'A': 13,
+	'K': 12,
+	'Q': 11,
 	'T': 10,
 	'9': 9,
 	'8': 8,
@@ -38,6 +37,7 @@ var cardRanks = map[rune]int{
 	'4': 4,
 	'3': 3,
 	'2': 2,
+	'J': 1,
 }
 
 type Hand struct {
@@ -97,9 +97,11 @@ func orderHands(hands []Hand) []Hand {
 }
 
 func compareHighCards(a Hand, b Hand) bool {
-
+	fmt.Println("Comparing high cards: ", string(a.cards), string(b.cards))
 	for i := range a.cards {
 		if a.cards[i] != b.cards[i] {
+			fmt.Println("Comparing: ", string(a.cards[i]), string(b.cards[i]))
+			fmt.Println(cardRanks[a.cards[i]] < cardRanks[b.cards[i]])
 			return cardRanks[a.cards[i]] < cardRanks[b.cards[i]]
 		}
 	}
@@ -163,27 +165,42 @@ func getHandType(hand Hand) Hand {
 
 	// Group like cards together - [['A',2], ['Q',2], ['J',1]]
 	groups := [][]rune{}
+	jokers := 0
 	high := '2'
 	for _, card := range hand.cards {
+		// Check for jokers
+		if card == 'J' {
+			jokers += 1
+			continue
+		}
 
 		// Get high card
 		if cardRanks[card] > cardRanks[high] {
 			high = card
 		}
 
-		// if groups is not empty
-		if len(groups) > 0 {
-			// Check if card is in groups
-			for i, group := range groups {
-				if group[0] == card {
-					groups[i][1] += 1
-					break
-				}
+		// Check if card is in groups
+		found := false
+		for i, group := range groups {
+			if group[0] == card {
+				groups[i][1] += 1
+				found = true
+				break
 			}
 		}
-		// If groups is empty or card is not in groups
-		// Add card to groups
-		groups = append(groups, []rune{card, 1})
+
+		// If card is not in groups, add it
+		if !found {
+			groups = append(groups, []rune{card, 1})
+		}
+	}
+
+	// Check for 5 jokers
+	if jokers == 5 {
+
+		hand.handType = FiveOfAKind
+		hand.high = 'J'
+		return hand
 	}
 
 	hand.cardGroups = groups
@@ -193,8 +210,56 @@ func getHandType(hand Hand) Hand {
 		return groups[i][1] > groups[j][1]
 	})
 
-	// fmt.Println("groups: ", groups)
+	// apply jokers
+	if jokers > 0 && len(groups) > 0 {
 
+		// Try to make a 5 of a kind
+		if int(groups[0][1])+jokers == 5 {
+			hand.handType = FiveOfAKind
+			hand.high = groups[0][0]
+			return hand
+		}
+
+		// Try to make a 4 of a kind
+		if int(groups[0][1])+jokers == 4 {
+			hand.handType = FourOfAKind
+			hand.high = groups[0][0]
+			return hand
+		}
+
+		// Try to make a full house from T3T3J
+		if (groups[0][1] == 3 && jokers == 2) ||
+			(groups[0][1] == 2 && groups[1][1] == 2 && jokers == 1) ||
+			(groups[0][1] == 3 && groups[1][1] == 1 && jokers == 1) {
+			hand.handType = FullHouse
+			hand.high = groups[0][0]
+			return hand
+		}
+
+		// Try to make a 3 of a kind
+		if int(groups[0][1])+jokers == 3 {
+			hand.handType = ThreeOfAKind
+			hand.high = groups[0][0]
+			return hand
+		}
+
+		// Try to make a 2 pair
+		if (len(groups) == 2 && groups[0][1] == 2 && groups[1][1] == 2) ||
+			(len(groups) == 3 && groups[0][1] == 2 && groups[1][1] == 2 && jokers == 1) {
+			hand.handType = TwoPair
+			hand.high = groups[0][0]
+			return hand
+		}
+
+		// Try to make a 1 pair
+		if (groups[0][1] == 2 && len(groups) == 4) ||
+			(groups[0][1] == 1 && jokers == 1) {
+			hand.handType = OnePair
+			hand.high = groups[0][0]
+			return hand
+		}
+
+	}
 	// Set high card
 	hand.high = high
 
