@@ -22,5 +22,14 @@ func TestReadInput(t *testing.T) {
 }
 
 func TestCalibrate(t *testing.T) {
+	calibrate1 := getSteps("./calibrate.txt")
 
+	if calibrate1 != 2 {
+		t.Errorf("Expected calibrate1 to be 2, got %d", calibrate1)
+	}
+
+	calibrate2 := getSteps("./calibrate2.txt")
+	if calibrate2 != 6 {
+		t.Errorf("Expected calibrate2 to be 6, got %d", calibrate2)
+	}
 }

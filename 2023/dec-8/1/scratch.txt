@@ -1,0 +1,39 @@
+You're riding a camel in a desert and suddenly see a sandstorm coming. The person with you, who just warned about ghosts, vanishes. There are documents in the camel's pouches—some with navigation instructions and others describing a network of labeled nodes. Your task is to use the left/right instructions to guide the camel through the network from node AAA to ZZZ and escape the haunted desert.
+
+This format defines each node of the network individually. For example:
+
+RL - This can be read as "R means the right element of the current node, and L means the left element of the current node." The current node is the node you are currently on. For example, if you are on AAA, then R means CCC and L means BBB.
+
+The network is a directed graph, where each node has exactly two outgoing edges. The left and right elements of a node are the two outgoing edges. For example, if a node has the left element BBB and the right element CCC, then the node has two outgoing edges: BBB and CCC.
+
+RL repeats until you reach ZZZ so RL can be read as RLRLRLRLRLRLRLRL
+
+AAA = (BBB, CCC)
+BBB = (DDD, EEE)
+CCC = (ZZZ, GGG)
+DDD = (DDD, DDD)
+EEE = (EEE, EEE)
+GGG = (GGG, GGG)
+ZZZ = (ZZZ, ZZZ)
+
+SO - TASK = GET FROM AAA TO ZZZ
+
+AAA - R is CCC
+CCC - L is ZZZ
+
+YAY - ZZZ
+
+===============================
+
+LLR
+
+AAA = (BBB, BBB)
+BBB = (AAA, ZZZ)
+ZZZ = (ZZZ, ZZZ)
+
+AAA - L is BBB
+BBB - L is AAA
+AAA - R is BBB
+BBB - L is AAA
+AAA - L is BBB
+BBB - R is ZZZ
