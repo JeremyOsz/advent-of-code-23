@@ -42,16 +42,6 @@ func analyseInput(filename string) ([]int, int) {
 
 	for _, line := range input {
 		// fmt.Println(line)
-		// for 0   3   6   9  12  15
-		// verticals = [
-		// 	[0, 3, 0],
-		// 	[3, 3, 0],
-		// 	[6, 3, 0],
-		// 	[9, 3, 0],
-		// 	[12, 3, 0],
-		// ]
-
-		// verticals := [][]int{}
 		values := string_helpers.ConvertSliceToInts(strings.Split(line, " "))
 		pyramid := buildPyramid(Pyramid{values})
 		nextValue := getNextValue(pyramid)
