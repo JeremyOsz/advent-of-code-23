@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	io_helpers "jeremyosz/go-advent-2023/2023/helpers/io"
 	string_helpers "jeremyosz/go-advent-2023/2023/helpers/strings"
-	"log"
-	"os"
 	"strings"
+	"sync"
 )
 
 type Pyramid [][]int
@@ -25,27 +25,37 @@ func main() {
 
 func readInput(filename string) []string {
 	// read input from filename and return as []string
-	input, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return io_helpers.ReadFileLines(filename)
 
-	// Split the input into lines
-	return strings.Split(string(input), "\n")
 }
 
 func analyseInput(filename string) ([]int, int) {
 	// analyseInput returns the values and sum of the input
 	input := readInput(filename)
-	nextValues := []int{}
+	nextValues := make([]int, len(input))
 	sum := 0
+	var wg sync.WaitGroup
+	results := make(chan int, len(input))
 
-	for _, line := range input {
-		values := string_helpers.ConvertSliceToInts(strings.Split(line, " "))
-		pyramid := buildPyramid(Pyramid{values})
-		nextValue := getLastValue(pyramid)
-		nextValues = append(nextValues, nextValue)
-		sum += nextValue
+	for i, line := range input {
+		wg.Add(1)
+		go func(i int, line string) {
+			defer wg.Done()
+			values := string_helpers.ConvertSliceToInts(strings.Split(line, " "))
+			pyramid := buildPyramid(Pyramid{values})
+			nextValue := getLastValue(pyramid)
+			nextValues[i] = nextValue
+			results <- nextValue
+		}(i, line)
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	for result := range results {
+		sum += result
 	}
 
 	return nextValues, sum

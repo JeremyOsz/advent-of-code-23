@@ -16,8 +16,7 @@ func ConvertToInt(number string) int {
 }
 
 func ConvertSliceToInts(slice []string) []int {
-	var intSlice []int
-	// Convert slice of strings to slice of ints
+	intSlice := make([]int, 0, len(slice))
 	for _, number := range slice {
 		if number == "" {
 			continue

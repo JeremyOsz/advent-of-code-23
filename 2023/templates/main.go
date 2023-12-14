@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"strings"
+	io_helpers "jeremyosz/go-advent-2023/2023/helpers/io"
 )
 
 func main() {
@@ -13,11 +11,6 @@ func main() {
 
 func readInput(filename string) []string {
 	// read input from filename and return as []string
-	input, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return io_helpers.ReadFileLines(filename)
 
-	// Split the input into lines
-	return strings.Split(string(input), "\n")
 }
