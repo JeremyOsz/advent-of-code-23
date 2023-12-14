@@ -28,11 +28,13 @@ func getSteps(filename string) int {
 	input := readInput(filename)
 
 	instructions := input[0]
+	fmt.Println(instructions)
 
 	// Create a map like this:
 	// [AAA: [BBB,  CCC]]
 	// [BBB: [DDD,  EEE]]
 	nodes := make(map[string][]string)
+	startingNodes := []string{}
 	for _, line := range input[2:] { // skip the first 2 lines
 		// fmt.Println(line)
 		// Parse AAA = (BBB, CCC) as AAA: [BBB, CCC]
@@ -44,43 +46,67 @@ func getSteps(filename string) int {
 		L := value[0][1:]
 		R := value[1][:len(value[1])-1]
 
-		// Add to map
+		// Add node to map
 		nodes[key] = []string{L, R}
+
+		// If node is starting node, add key to startingNodes
+		// get last digit of key
+		if key[2] == 'A' {
+			startingNodes = append(startingNodes, key)
+		}
 	}
 
-	fmt.Println(nodes)
+	// fmt.Println("nodes", nodes)
+	// fmt.Println("startingNodes: ", startingNodes)
 
-	// Follow the instructions
-	currentNode := nodes["AAA"]
 	steps := 1
-	return stepThroughNodes(currentNode, instructions, nodes, steps)
+
+	return stepThroughNodes(startingNodes, instructions, nodes, steps)
 
 }
 
 func stepThroughNodes(
-	currentNode []string,
+	currentNodes []string,
 	instructions string,
 	nodes map[string][]string,
 	steps int) int {
+	fmt.Println("currentNodes: ", currentNodes)
 	for _, instruction := range instructions {
-		nextNode := ""
-		if instruction == 'L' {
-			nextNode = currentNode[0]
-		} else {
-			nextNode = currentNode[1]
+
+		nextNodes := currentNodes
+		atZ := []bool{}
+		for i := range currentNodes {
+			if instruction == 'L' {
+				nextNodes[i] = nodes[currentNodes[i]][0]
+			} else {
+				nextNodes[i] = nodes[currentNodes[i]][1]
+			}
+
+			if nextNodes[i][2] == 'Z' {
+				atZ = append(atZ, true)
+			} else {
+				atZ = append(atZ, false)
+			}
 		}
 
-		// If key of currentNode is ZZZ, we're done
-		fmt.Println("Current Node: ", currentNode)
-		fmt.Println("Next Node: ", nextNode)
-
-		if nextNode == "ZZZ" {
-			fmt.Println("Reached ZZZ in ", steps, " steps")
+		// if all in atZ are true, return steps
+		if allTrue(atZ) {
+			fmt.Println("Reached Z in ", steps, " steps")
 			return steps
 		} else {
-			currentNode = nodes[nextNode]
+			currentNodes = nextNodes
 			steps++
 		}
 	}
-	return stepThroughNodes(currentNode, instructions, nodes, steps)
+	return stepThroughNodes(currentNodes, instructions, nodes, steps)
+	// return steps
+}
+
+func allTrue(arr []bool) bool {
+	for _, v := range arr {
+		if !v {
+			return false
+		}
+	}
+	return true
 }

@@ -32,4 +32,9 @@ func TestCalibrate(t *testing.T) {
 	if calibrate2 != 6 {
 		t.Errorf("Expected calibrate2 to be 6, got %d", calibrate2)
 	}
+
+	calibrate3 := getSteps("./calibrate3.txt")
+	if calibrate3 != 6 {
+		t.Errorf("Expected calibrate3 to be 6, got %d", calibrate3)
+	}
 }
