@@ -41,12 +41,9 @@ func analyseInput(filename string) ([]int, int) {
 	sum := 0
 
 	for _, line := range input {
-		// fmt.Println(line)
 		values := string_helpers.ConvertSliceToInts(strings.Split(line, " "))
 		pyramid := buildPyramid(Pyramid{values})
-		nextValue := getNextValue(pyramid)
-		// fmt.Println(pyramid)
-		// fmt.Println(nextValue)
+		nextValue := getLastValue(pyramid)
 		nextValues = append(nextValues, nextValue)
 		sum += nextValue
 	}
@@ -75,19 +72,22 @@ func buildPyramid(pyramid Pyramid) Pyramid {
 	return buildPyramid(pyramid)
 }
 
-func getNextValue(pyramid Pyramid) int {
-	// fmt.Println("=====================================")
-	// fmt.Println("Getting next value for pyramid: ", pyramid)
-	sum := 0
-	sums := []int{}
+func getLastValue(pyramid Pyramid) int {
+	fmt.Println("Getting last value for pyramid: ", pyramid)
+	differences := []int{}
 	// reverse loop through pyramid
 	for i := len(pyramid) - 1; i > 0; i-- {
-		x := pyramid[i][len(pyramid[i])-1]
-		y := pyramid[i-1][len(pyramid[i-1])-1]
-		sum = x + y
-		pyramid[i-1] = append(pyramid[i-1], sum)
-		sums = append(sums, sum)
+		x := pyramid[i][0]
+		y := pyramid[i-1][0]
+		difference := y - x
+
+		fmt.Println("y-x", y, "-", x, " = ", difference)
+
+		differences = append(differences, difference)
+
+		// Make difference first element of pyramid[i-1]
+		pyramid[i-1] = append([]int{difference}, pyramid[i-1]...)
 	}
 
-	return sum
+	return differences[len(differences)-1]
 }

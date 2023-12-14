@@ -25,8 +25,8 @@ func TestCalibrate(t *testing.T) {
 
 	nextValues, sum := analyseInput("./calibrate.txt")
 
-	expectedValues := []int{3, 4, 5}
-	expectedSum := 12
+	expectedValues := []int{-3, 0, 5}
+	expectedSum := 2
 
 	if expectedSum != sum {
 		t.Errorf("Expected %d, got %d", expectedSum, sum)
