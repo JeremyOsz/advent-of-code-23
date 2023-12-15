@@ -1,0 +1,43 @@
+| is a vertical pipe connecting north and south.
+- is a horizontal pipe connecting east and west.
+L is a 90-degree bend connecting north and east.
+J is a 90-degree bend connecting north and west.
+7 is a 90-degree bend connecting south and west.
+F is a 90-degree bend connecting south and east.
+. is ground; there is no pipe in this tile.
+S is the starting position of the animal; there is a pipe on this tile, but your sketch doesn't show what shape the pipe has.
+
+Loop looks like:
+.....
+.F-7.
+.|.|.
+.L-J.
+.....
+
+Start in NW - Pipe shape is inferred by adjacent pipes
+..... 
+.S-7.
+.|.|.
+.L-J.
+.....
+
+Would actually look like
+-L|F7
+7S-7|
+L|7||
+-L-J|
+L|-JF
+
+And 
+
+7-F7-     ..F7.
+.FJ|7     .FJ|.
+SJLL7     SJ.L7
+|F--J     |F--J
+LJ.LJ     LJ...
+
+
+Task: get out ahead of the animal
+- Find fathest point from start - by steps in loop
+
+How many steps along the loop does it take to get from the starting position to the point farthest from the starting position?
