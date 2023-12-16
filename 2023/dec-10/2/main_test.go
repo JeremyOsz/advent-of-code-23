@@ -25,7 +25,7 @@ func TestCalibrate(t *testing.T) {
 	input1 := readInput("./calibrate.txt")
 	test1 := getTilesEnclosed(input1)
 
-	if test1 !=  {
+	if test1 != 4 {
 		t.Errorf("Expected test1 to be 4, got %d", test1)
 	}
 

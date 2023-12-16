@@ -1,20 +1,29 @@
 package io_helpers
 
 import (
+	"bufio"
 	"log"
 	"os"
-	"strings"
 )
 
-func ReadFileLines(filename string) []string {
-	// read input from filename and return as []string
-	input, err := os.ReadFile(filename)
+func ReadFileLines(filename string) ([]string, error) {
+	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
+	}
+	defer file.Close()
+
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
 	}
 
-	// Split the input into lines
-	return strings.Split(string(input), "\n")
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return lines, nil
 }
 
 func ReadFileString(filename string) string {
