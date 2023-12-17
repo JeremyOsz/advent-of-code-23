@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"jeremyosz/go-advent-2023/2023/helpers/math"
 	"log"
 	"os"
 	"strings"
@@ -84,7 +85,7 @@ func getSteps(filename string) int {
 
 	fmt.Println("Path steps: ", pathSteps)
 
-	return LCM(pathStepsArr[0], pathStepsArr[1], pathStepsArr...)
+	return math.LCM(pathStepsArr[0], pathStepsArr[1], pathStepsArr...)
 }
 
 func stepThroughNodes(
@@ -118,25 +119,4 @@ func allTrue(arr []bool) bool {
 		}
 	}
 	return true
-}
-
-// Function to calculate GCD (Greatest Common Divisor)
-func GCD(a, b int) int {
-	for b != 0 {
-		t := b
-		b = a % b
-		a = t
-	}
-	return a
-}
-
-// Function to calculate LCM (Least Common Multiple)
-func LCM(a, b int, integers ...int) int {
-	result := a * b / GCD(a, b)
-
-	for i := 0; i < len(integers); i++ {
-		result = LCM(result, integers[i])
-	}
-
-	return result
 }

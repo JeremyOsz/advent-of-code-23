@@ -6,10 +6,10 @@ import (
 	"os"
 )
 
-func ReadFileLines(filename string) ([]string, error) {
+func ReadFileLines(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 	defer file.Close()
 
@@ -20,10 +20,10 @@ func ReadFileLines(filename string) ([]string, error) {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	return lines, nil
+	return lines
 }
 
 func ReadFileString(filename string) string {
