@@ -1,0 +1,58 @@
+Comparing high cards:  T Q
+Comparing high cards:  Q Q
+Comparing high cards:  Q T
+===========================
+Hand:  2345A
+Hand Groups:  [[50 1] [51 1] [52 1] [53 1] [65 1]]
+Bet:  1
+Hand Type:  7
+High Card:  A
+Rank:  1
+Winnings:  1
+===========================
+===========================
+Hand:  2345J
+Hand Groups:  [[50 1] [51 1] [52 1] [53 1]]
+Bet:  3
+Hand Type:  6
+High Card:  2
+Rank:  2
+Winnings:  6
+===========================
+===========================
+Hand:  T3T3J
+Hand Groups:  [[84 2] [51 2]]
+Bet:  17
+Hand Type:  4
+High Card:  T
+Rank:  3
+Winnings:  51
+===========================
+===========================
+Hand:  T3Q33
+Hand Groups:  [[51 3] [84 1] [81 1]]
+Bet:  11
+Hand Type:  4
+High Card:  Q
+Rank:  4
+Winnings:  44
+===========================
+===========================
+Hand:  Q2KJJ
+Hand Groups:  [[81 1] [50 1] [75 1]]
+Bet:  13
+Hand Type:  4
+High Card:  Q
+Rank:  5
+Winnings:  65
+===========================
+===========================
+Hand:  Q2Q2Q
+Hand Groups:  [[81 3] [50 2]]
+Bet:  19
+Hand Type:  3
+High Card:  Q
+Rank:  6
+Winnings:  114
+===========================
+Total Winnings:  281
