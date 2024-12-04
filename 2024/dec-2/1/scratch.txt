@@ -1,0 +1,22 @@
+Unusual Data
+
+7 6 4 2 1
+1 2 7 8 9
+9 7 6 2 1
+1 3 2 4 5
+8 6 4 4 1
+1 3 6 7 9
+
+Line: Report
+Number: levels
+
+Find out which are *safe*
+- The levels are either all increasing or all decreasing.
+- Any two adjacent levels differ by at least one and at most three.
+
+
+1. Create an array of differences between adjacent levels.
+2. Check if all differences are positive or all differences are negative.
+3. Check if all differences are between 1 and 3 absolute value.
+
+TASK - how many safe
