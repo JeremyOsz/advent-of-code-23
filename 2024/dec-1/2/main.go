@@ -14,7 +14,6 @@ func main() {
 func readInput(filename string) []string {
 	// read input from filename and return as []string
 	return io_helpers.ReadFileLines(filename)
-
 }
 
 func calculateSimilarity(filename string) int {
@@ -28,15 +27,7 @@ func calculateSimilarity(filename string) int {
 		listB = append(listB, string_helpers.ConvertToInt(strings[1]))
 	}
 
-	// sort listA and listB
-	// sort.Ints(listA)
-	// sort.Ints(listB)
-
-	fmt.Println(listA)
-	fmt.Println(listB)
-
 	// calculate similarity
-
 	similarity := 0
 	for i := 0; i < len(listA); i++ {
 		lineSimilarity := 0

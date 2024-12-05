@@ -1,0 +1,16 @@
+- Computer is corrupted
+- multiply some numbers mul(x,y)
+- numbers are 1-3 digits
+- ignore invalid sections
+
+eg in 
+`xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5)`
+
+only 4 sections are valid
+
+`mul(2,4) mul[3,7] mul(11,8) mul(8,5)`
+
+161 (2*4 + 5*5 + 11*8 + 8*5)
+
+HOW TO SOLVE
+- extract all valid sections using regex (mul(x,y))

@@ -43,7 +43,6 @@ func testSafety(filename string) int {
 				}
 			}
 		}
-
 	}
 	return safeReports
 }
