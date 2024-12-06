@@ -1,0 +1,77 @@
+Find the word XMAS 
+
+Can be:
+- Horizontal
+- Vertical
+- Diagonal
+- Reverse
+
+
+SO:
+
+MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX
+
+Becomes:
+....XXMAS.
+.SAMXMS...
+...S..A...
+..A.A.MS.X
+XMASAMX.MM
+X.....XA.A
+S.S.S.S.SS
+.A.A.A.A.A
+..M.M.M.MM
+.X.X.XMASX
+
+---------------------------------
+
+XMAS = 4 letters
+
+- Find X 
+- Check 4 forwards X M A S
+- Check 4 backwards S A M X
+- Check 4 down X M A S
+- Check 4 up S A M X
+- Check 4 diagonal X M A S
+- Check 4 reverse diagonal S A M X
+
+Delta = 3
+
+
+PART TWO
+
+find
+M.S
+.A.
+M.S
+
+.M.S......
+..A..MSMS.
+.M.S.MAA..
+..A.ASMSM.
+.M.S.M....
+..........
+S.S.S.S.S.
+.A.A.A.A..
+M.M.M.M.M.
+..........
+
+In this example, an X-MAS appears 9 times.
+
+possible variations:
+M.S
+.A.
+M.S
+
+S.M
+.A.
+M.S
